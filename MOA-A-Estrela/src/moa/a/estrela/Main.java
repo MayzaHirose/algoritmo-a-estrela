@@ -8,35 +8,38 @@ package moa.a.estrela;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
- * @author mayza
+ * @author Mayza Hirose
  */
 public class Main {
 
-    public static List<Node> estadosAbertos = new ArrayList<>();
-    public static List<Node> estadosFechados = new ArrayList<>();
-    public static List<Integer> listaInicial = new ArrayList<>(Arrays.asList(2, 1, 5, 9, 3, 6, 10, 13, 4, 7, 11, 14, 0, 8, 12, 15));
-    public static List<Integer> listaFinal = new ArrayList<>(Arrays.asList(1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 0));
-    int funcaoF;
-    public static Node menorEstado;
+    static Set<Node> estadosAbertos = new TreeSet<>();
+    static Set<Node> estadosFechados = new TreeSet<>();
+    static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}};
+    static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
+    static Node menorEstado;
 
     public static void main(String[] args) {
-        aEstrela(listaInicial);
+        aEstrela();
     }
 
-    public static void aEstrela(List listaInicial) {
+    static void aEstrela() {
         Node estadoInicial = new Node();
-        estadosAbertos.add(estadoInicial);
         estadoInicial.setEstado(listaInicial);
-        estadoInicial.setHeuristica(calculaHeuristica(estadoInicial));
-        estadoInicial.setCusto(0);
+        estadoInicial.setHeuristica(calculaHeuristica1(estadoInicial));
+        estadoInicial.setCustoG(0);
+        estadoInicial.setCustoF(estadoInicial.getHeuristica() + estadoInicial.getCustoG());
         estadoInicial.setPai(null);
         estadoInicial.setFilhos(filhosNode(estadoInicial));
-        while ((estadosAbertos.size() != 0)) {
-            menorEstado = menorHeuristica();
-            estadosFechados.add(menorEstado);
+        estadosAbertos.add(estadoInicial);
+        menorEstado = estadosAbertos.iterator().next();
+        estadosAbertos.remove(menorEstado);
+        estadosFechados.add(menorEstado);
+        while ((estadosAbertos.size() != 0) && !isEstadoFinal(menorEstado)) {                    
         }
         /*insere o node inicial na lista
         para cada estado filho possivel, poe no aberto com cada um tendo o node pai
@@ -44,30 +47,88 @@ public class Main {
         calcula melhor nodo a ser percorrido (calcula as heuristicas)*/
     }
 
-    public static int calculaHeuristica(Node node) {
+    static int calculaHeuristica1(Node node) {
         int heuristica = 0;
-        for (int i = 0; i < node.getEstado().size(); i++) {
-            if (node.getEstado().get(i) != listaFinal.get(i)) {
-                heuristica++;
-                node.setHeuristica(heuristica);
+        for (int i=0; i<4; i++) {
+            for(int j=0; j<4; j++){
+                if ((node.getEstado()[i][j] != listaFinal[i][j]) && (node.getEstado()[i][j] != 0)) {
+                    heuristica++;                   
+                }
             }
         }
         return heuristica;
     }
-
-    public static Node menorHeuristica() {
-
-        //estadosAbertos.
-        return null;
+    
+    static boolean isEstadoFinal(Node node){
+        return Arrays.deepEquals(node.getEstado(), listaFinal);
     }
 
-    public static List filhosNode(Node estado) {
-        List<Node> filhos = new ArrayList();
-        int vazio = posVazio(estado);
-        boolean isBordaEsq = isBordaEsq(vazio);
-        boolean isBordaDir = isBordaDir(vazio);
-        boolean isBordaCima = isBordaCima(vazio);
-        boolean isBordaBaixo = isBordaBaixo(vazio);
+    static Set filhosNode(Node node) throws CloneNotSupportedException{
+        Set<Node> filhos = new TreeSet();
+        for (int row=0; row<4; row++) {
+            for(int col=0; col<4; col++){
+                if (node.getEstado()[row][col] == 0){
+                    boolean isBordaEsq = isBordaEsq(col);
+                    boolean isBordaDir = isBordaDir(col);
+                    boolean isBordaCima = isBordaCima(row);
+                    boolean isBordaBaixo = isBordaBaixo(row);
+                    if (isBordaEsq) {
+                        Node dir = node.clone();
+                        dir.getEstado()[row][col] = node.getEstado()[row][col+1];
+                        if (isBordaCima) {
+                            Node baixo = node.clone();
+                            baixo.
+                            return filhos;
+                        } else if (isBordaBaixo) {
+                            Node cima = node.clone();
+                            return filhos;
+                        } else {
+                            Node cima = node.clone();
+                            Node baixo = node.clone();
+                            return filhos;
+                        }
+                    } else {
+                        Node esq = node.clone();
+                        if (isBordaCima) {
+                            Node baixo = node.clone();
+                            return filhos;
+                        } else if (isBordaBaixo) {
+                            Node cima = node.clone();
+                            return filhos;
+                        } else {
+                            Node cima = node.clone();
+                            Node baixo = node.clone();
+                            return filhos;
+                        }
+                    }
+                }
+            }
+        }
+        return filhos;
+    }
+    
+    static boolean isBordaDir(int col) {
+        return (((col + 1) % 4) == 0);
+    }
+
+    static boolean isBordaEsq(int col) {
+        return ((col % 4) == 0);
+    }
+
+    static boolean isBordaCima(int row) {
+        return (row == 0);
+    }
+
+    static boolean isBordaBaixo(int row) {
+        return (row == 3);
+    }    
+    /*static Set filhosNode(Node estado) {
+        Set<Node> filhos = new TreeSet();
+        int posZero = posZero(estado);
+        boolean isBordaEsq = isBordaEsq(posZero);
+        boolean isBordaDir = isBordaDir(posZero);
+        boolean isBordaCima = isBordaCima(posZero);
+        boolean isBordaBaixo = isBordaBaixo(posZero);
         if (isBordaEsq) {
             Node dir;
             if (isBordaCima) {
@@ -97,59 +158,47 @@ public class Main {
         }
     }
 
-    public static int posVazio(Node estado) {
+    static int posZero(Node node) {
         int pos = 0;
-        for (pos = 0; pos < (estado.getEstado().size()); pos++) {
-            if (estado.getEstado().get(pos) == 0) {
-                break;
+        for (int i=0; i<4; i++) {
+            for(int j=0; j<4; j++){
+                if (node.getEstado()[i][j] == 0) {
+                    return pos;
+                }
+                pos++;
             }
         }
         return pos;
-    }
+    }*/
 
-    public static boolean isBordaDir(int posZero) {
+    /*static boolean isBordaDir(int posZero) {
         return (((posZero + 1) % 4) == 0);
     }
 
-    public static boolean isBordaEsq(int posZero) {
+    static boolean isBordaEsq(int posZero) {
         return (((posZero) % 4) == 0);
     }
 
-    public static boolean isBordaCima(int posZero) {
-        return ((posZero + 4) >= 16);
-    }
-
-    public static boolean isBordaBaixo(int posZero) {
+    static boolean isBordaCima(int posZero) {
         return (posZero < 4);
     }
 
-    /*List<Integer> listaInicial = new ArrayList<>();
-        listaInicial.add(2);
-        listaInicial.add(1);
-        listaInicial.add(5);
-        listaInicial.add(9);
-        listaInicial.add(3);
-        listaInicial.add(6);
-        listaInicial.add(10);
-        listaInicial.add(13);
-        listaInicial.add(4);
-        listaInicial.add(7);
-        listaInicial.add(11);
-        listaInicial.add(14);
-        listaInicial.add(0);
-        listaInicial.add(8);
-        listaInicial.add(12);
-        listaInicial.add(15);*/
+    static boolean isBordaBaixo(int posZero) {
+        return ((posZero + 4) >= 16);
+    }*/
+ 
 }
 
-class Node implements Comparable<Node> {
+class Node implements Comparable<Node>, Cloneable {
 
     private Node pai;
-    private List<Node> filhos;
+    private Set<Node> filhos; 
     private int heuristica;
-    private int custo;
-    private List<Integer> estado = new ArrayList<>();
+    private int custoG;
+    private int custoF;  
+    private int[][] estado;
 
+    //<editor-fold defaultstate="collapsed" desc=" Getters and Setters ">
     public int getHeuristica() {
         return heuristica;
     }
@@ -158,19 +207,27 @@ class Node implements Comparable<Node> {
         this.heuristica = heuristica;
     }
 
-    public int getCusto() {
-        return custo;
+    public int getCustoG() {
+        return custoG;
     }
 
-    public void setCusto(int custo) {
-        this.custo = custo;
+    public void setCustoG(int custoG) {
+        this.custoG = custoG;
+    }
+    
+    public int getCustoF() {
+        return custoF;
     }
 
-    public List<Integer> getEstado() {
+    public void setCustoF(int custoF) {
+        this.custoF = custoF;
+    }
+
+    public int[][] getEstado() {
         return estado;
     }
 
-    public void setEstado(List<Integer> estado) {
+    public void setEstado(int[][] estado) {
         this.estado = estado;
     }
 
@@ -182,19 +239,21 @@ class Node implements Comparable<Node> {
         this.pai = pai;
     }
 
-    public List<Node> getFilhos() {
+    public Set<Node> getFilhos() {
         return filhos;
     }
 
-    public void setFilhos(List<Node> filhos) {
+    public void setFilhos(Set<Node> filhos) {
         this.filhos = filhos;
     }
-
+    //</editor-fold>
+      
     @Override
     public int compareTo(Node o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return custoF - o.custoF;
     }
 
+    //compara pelo tabuleiro de estado
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -220,5 +279,9 @@ class Node implements Comparable<Node> {
         }
         return true;
     }
-
+    
+    @Override
+    public Node clone() throws CloneNotSupportedException {
+        return (Node) super.clone();
+    }
 }
