@@ -27,8 +27,8 @@ class Main {
     //static int[][] listaInicial = {{6,5,9,13}, {1,7,10,0}, {2,8,11,14}, {3,4,12,15}}; //Teste Heuristica 2
     //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  
     //static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos
-    static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
-    //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
+    //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
+    static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
     //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos
     static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
     static Node inicio = new Node();
@@ -55,15 +55,15 @@ class Main {
     static void aEstrela (){
         estadosAbertos.add(inicio);        
         menor = estadosAbertos.iterator().next();
-        while ((estadosAbertos.size() != 0) && !isEstadoFinal(menor)) {            
+        while ((!estadosAbertos.isEmpty()) && !isEstadoFinal(menor)) {            
             estadosAbertos.remove(menor);
             estadosFechados.add(menor);                        
             if(menor.getFilhos() == null){
                 menor.setFilhos(filhosNode(menor));
             }
             for(Node filho: menor.getFilhos()){
-                //calcula G. No caso ja foi calculado qdo criou os filhos
-                Iterator it = estadosAbertos.iterator();
+                
+                /*Iterator it = estadosAbertos.iterator();
                 while(it.hasNext()){
                     Node atual = (Node) it.next();
                     if(isIguais(atual, filho)){
@@ -82,7 +82,7 @@ class Main {
                             break;
                         }
                     }
-                }
+                }*/
                 estadosAbertos.add(filho);               
                 menor = estadosAbertos.iterator().next();                         
             }
@@ -294,10 +294,5 @@ class Node implements Comparable<Node>{
         else {
             return 1;
         }      
-    }
-    
-    @Override
-    public String toString(){
-        return "hello";
     }
 }
