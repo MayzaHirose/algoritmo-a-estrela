@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
+import static moa.a.estrela.Main.listaFinal;
 
 /**
  *
@@ -24,9 +25,9 @@ class Main {
     static Set<Node> estadosFechados = new TreeSet<>();
     //static int[][] listaInicial = new int[4][4];
     //static int[][] listaInicial = {{6,5,9,13}, {1,7,10,0}, {2,8,11,14}, {3,4,12,15}}; //Teste Heuristica 2
-    static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  
+    //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  
     //static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos
-    //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
+    static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
     //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
     //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos
     static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
@@ -136,7 +137,18 @@ class Main {
                     boolean isBordaDir = isBordaDir(col);
                     boolean isBordaCima = isBordaCima(row);
                     boolean isBordaBaixo = isBordaBaixo(row);
-                    if (isBordaEsq) {
+                    if(!isBordaEsq){
+                        Node esq = new Node();
+                        esq.setPai(pai);
+                        esq.setEstado(copiaEstado(pai.getEstado()));
+                        esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
+                        esq.getEstado()[row][col-1] = 0;
+                        esq.setHeuristica(calculaHeuristica1(esq));
+                        esq.setCustoG(pai.getCustoG() + 1);
+                        esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
+                        filhos.add(esq);                         
+                    }
+                    if(!isBordaDir){
                         Node dir = new Node();
                         dir.setPai(pai);
                         dir.setEstado(copiaEstado(pai.getEstado()));
@@ -146,111 +158,30 @@ class Main {
                         dir.setCustoG(pai.getCustoG() + 1);
                         dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
                         filhos.add(dir);
-                        if (isBordaCima) {
-                            Node baixo = new Node();
-                            baixo.setPai(pai);
-                            baixo.setEstado(copiaEstado(pai.getEstado()));
-                            baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
-                            baixo.getEstado()[row+1][col] = 0;
-                            baixo.setHeuristica(calculaHeuristica1(baixo));
-                            baixo.setCustoG(pai.getCustoG() + 1);
-                            baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
-                            filhos.add(baixo);
-                        } else if (isBordaBaixo) {
-                            Node cima = new Node();
-                            cima.setPai(pai);
-                            cima.setEstado(copiaEstado(pai.getEstado()));
-                            cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
-                            cima.getEstado()[row-1][col] = 0;
-                            cima.setHeuristica(calculaHeuristica1(cima));
-                            cima.setCustoG(pai.getCustoG() + 1);
-                            cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
-                            filhos.add(cima);
-                        } else {
-                            Node cima = new Node();
-                            cima.setPai(pai);
-                            cima.setEstado(copiaEstado(pai.getEstado()));
-                            cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
-                            cima.getEstado()[row-1][col] = 0;
-                            cima.setHeuristica(calculaHeuristica1(cima));
-                            cima.setCustoG(pai.getCustoG() + 1);
-                            cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
-                            filhos.add(cima);
-                            
-                            Node baixo = new Node();
-                            baixo.setPai(pai);
-                            baixo.setEstado(copiaEstado(pai.getEstado()));
-                            baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
-                            baixo.getEstado()[row+1][col] = 0;
-                            baixo.setHeuristica(calculaHeuristica1(baixo));
-                            baixo.setCustoG(pai.getCustoG() + 1);
-                            baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
-                            filhos.add(baixo);
-                        }
-                    } else {
-                        Node esq = new Node();
-                        esq.setPai(pai);
-                        esq.setEstado(copiaEstado(pai.getEstado()));
-                        esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
-                        esq.getEstado()[row][col-1] = 0;
-                        esq.setHeuristica(calculaHeuristica1(esq));
-                        esq.setCustoG(pai.getCustoG() + 1);
-                        esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
-                        filhos.add(esq);                      
-                        if (isBordaCima) {
-                            Node baixo = new Node();
-                            baixo.setPai(pai);
-                            baixo.setEstado(copiaEstado(pai.getEstado()));
-                            baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
-                            baixo.getEstado()[row+1][col] = 0;
-                            baixo.setHeuristica(calculaHeuristica1(baixo));
-                            baixo.setCustoG(pai.getCustoG() + 1);
-                            baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
-                            filhos.add(baixo);
-                        } else if (isBordaBaixo) {
-                            Node cima = new Node();
-                            cima.setPai(pai);
-                            cima.setEstado(copiaEstado(pai.getEstado()));
-                            cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
-                            cima.getEstado()[row-1][col] = 0;
-                            cima.setHeuristica(calculaHeuristica1(cima));
-                            cima.setCustoG(pai.getCustoG() + 1);
-                            cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
-                            filhos.add(cima);
-                        } else {
-                            Node cima = new Node();
-                            cima.setPai(pai);
-                            cima.setEstado(copiaEstado(pai.getEstado()));
-                            cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
-                            cima.getEstado()[row-1][col] = 0;
-                            cima.setHeuristica(calculaHeuristica1(cima));
-                            cima.setCustoG(pai.getCustoG() + 1);
-                            cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
-                            filhos.add(cima);
-                            
-                            Node baixo = new Node();
-                            baixo.setPai(pai);
-                            baixo.setEstado(copiaEstado(pai.getEstado()));
-                            baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
-                            baixo.getEstado()[row+1][col] = 0;
-                            baixo.setHeuristica(calculaHeuristica1(baixo));
-                            baixo.setCustoG(pai.getCustoG() + 1);
-                            baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
-                            filhos.add(baixo);
-                        }
-                        if (!isBordaDir){
-                            Node dir = new Node();
-                            dir.setPai(pai);
-                            dir.setEstado(copiaEstado(pai.getEstado()));
-                            dir.getEstado()[row][col] = pai.getEstado()[row][col+1];
-                            dir.getEstado()[row][col+1] = 0;
-                            dir.setHeuristica(calculaHeuristica1(dir));
-                            dir.setCustoG(pai.getCustoG() + 1);
-                            dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
-                            filhos.add(dir);
-                        }
                     }
-                return filhos;
+                    if(!isBordaCima){
+                        Node cima = new Node();
+                        cima.setPai(pai);
+                        cima.setEstado(copiaEstado(pai.getEstado()));
+                        cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
+                        cima.getEstado()[row-1][col] = 0;
+                        cima.setHeuristica(calculaHeuristica1(cima));
+                        cima.setCustoG(pai.getCustoG() + 1);
+                        cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
+                        filhos.add(cima);
+                    }
+                    if(!isBordaBaixo){
+                        Node baixo = new Node();
+                        baixo.setPai(pai);
+                        baixo.setEstado(copiaEstado(pai.getEstado()));
+                        baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
+                        baixo.getEstado()[row+1][col] = 0;
+                        baixo.setHeuristica(calculaHeuristica1(baixo));
+                        baixo.setCustoG(pai.getCustoG() + 1);
+                        baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
+                        filhos.add(baixo);                        
+                    }                                      
+                    return filhos;
                 }
             }
         }
@@ -352,14 +283,21 @@ class Node implements Comparable<Node>{
     
     @Override
     public int compareTo(Node o) {
-        if (Arrays.deepEquals(this.estado, o.estado)){
+        if (Arrays.deepEquals(estado, o.estado)){
             return 0;
         }
-        else if (this.custoF < o.getCustoF()) {
-            return -1;
+        else if (this.custoF <= o.getCustoF()) {
+            if(Arrays.deepEquals(o.getEstado(), listaFinal)){
+                return 1;}
+            else{return -1;}
         }
         else {
             return 1;
         }      
+    }
+    
+    @Override
+    public String toString(){
+        return "hello";
     }
 }
