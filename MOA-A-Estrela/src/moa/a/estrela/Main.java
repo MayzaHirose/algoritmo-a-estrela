@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import static moa.a.estrela.Main.listaFinal;
@@ -23,13 +24,12 @@ class Main {
     static Set<Node> estadosAbertos = new TreeSet<>();
     static Set<Node> estadosFechados = new TreeSet<>();
     //static int[][] listaInicial = new int[4][4];
-    //static int[][] listaInicial = {{6,5,9,13}, {1,7,10,0}, {2,8,11,14}, {3,4,12,15}}; //Teste Heuristica 2
-    //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  
-    //static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos
-    //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
-    //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
-    //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos
-    static int[][] listaInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos 
+    //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  Heuristicas OK = 1 3 4 5
+    static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos  Heuristicas OK = 1 2 3 4 5
+    //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos  Heuristicas OK = 1 3 4 5
+    //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos  Heuristicas OK = 1 3 4 5
+    //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos  Heuristicas OK = 
+    //static int[][] listaInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos  Heuristicas OK = 
     static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
     static Node inicio = new Node();
     static Node menor;
@@ -44,8 +44,7 @@ class Main {
             }
         }*/
         inicio.setEstado(listaInicial);
-        inicio.setHeuristica(calculaHeuristica3(inicio));
-        System.out.println(inicio.getHeuristica());
+        inicio.setHeuristica(calculaHeuristica(inicio));
         inicio.setCustoG(0);
         inicio.setCustoF(inicio.getHeuristica() + inicio.getCustoG());
         inicio.setFilhos(filhosNode(inicio));
@@ -90,7 +89,15 @@ class Main {
         System.out.println(estadosAbertos.iterator().next().getCustoG());
     }
     
-    /*static int calculaHeuristica1(Node node) {
+    static int calculaHeuristica(Node node){
+        //return heuristica1(node);
+        //return heuristica2(node);
+        //return heuristica3(node);
+        //return heuristica4(node);
+        return heuristica5(node);
+    }
+    
+    static int heuristica1(Node node) {
         int heuristica = 0;
         for (int i=0; i<4; i++) {
             for(int j=0; j<4; j++){
@@ -100,9 +107,9 @@ class Main {
             }
         }
         return heuristica;
-    }*/
+    }
     
-    /*static int calculaHeuristica2(Node node){
+    static int heuristica2(Node node){
         int heuristica = 0;
         for (int i=0; i<4; i++) {
             for(int j=0; j<4; j++){
@@ -122,9 +129,9 @@ class Main {
             }
         }
         return heuristica;
-    }*/
+    }
     
-    static int calculaHeuristica3(Node node){
+    static int heuristica3(Node node){
         int heuristica = 0;
         for (int i=0; i<4; i++) {
             for(int j=0; j<4; j++){
@@ -143,55 +150,73 @@ class Main {
         return heuristica;
     }
     
+    static int heuristica4(Node node){
+        float heuristica = 0;
+        float p1 = 1/3F;
+        float p2 = 1/3F;
+        float p3 = 1/3F;
+        heuristica = (p1*heuristica1(node)) + (p2*heuristica2(node)) + (p3*heuristica3(node));
+        
+        return (int) heuristica;
+    }
+    
+    static int heuristica5(Node node){
+        int heuristica, h2, h3;
+        heuristica = heuristica1(node);
+        h2 = heuristica2(node);
+        h3 = heuristica3(node);
+        if(h2 > heuristica)
+            heuristica = h2;
+        if(h3 > heuristica)
+            heuristica = h3;
+        return heuristica;       
+    }
+    
     static List<Node> filhosNode(Node pai) {
         List<Node> filhos = new ArrayList<Node>();
         for (int row=0; row<4; row++) {
             for(int col=0; col<4; col++){
                 if (pai.getEstado()[row][col] == 0){
-                    boolean isBordaEsq = isBordaEsq(col);
-                    boolean isBordaDir = isBordaDir(col);
-                    boolean isBordaCima = isBordaCima(row);
-                    boolean isBordaBaixo = isBordaBaixo(row);
-                    if(!isBordaEsq){
+                    if(col != 0){
                         Node esq = new Node();
                         esq.setPai(pai);
                         esq.setEstado(copiaEstado(pai.getEstado()));
                         esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
                         esq.getEstado()[row][col-1] = 0;
-                        esq.setHeuristica(calculaHeuristica3(esq));
+                        esq.setHeuristica(calculaHeuristica(esq));
                         esq.setCustoG(pai.getCustoG() + 1);
                         esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
                         filhos.add(esq);                         
                     }
-                    if(!isBordaDir){
+                    if(col != 3){
                         Node dir = new Node();
                         dir.setPai(pai);
                         dir.setEstado(copiaEstado(pai.getEstado()));
                         dir.getEstado()[row][col] = pai.getEstado()[row][col+1];
                         dir.getEstado()[row][col+1] = 0;
-                        dir.setHeuristica(calculaHeuristica3(dir));
+                        dir.setHeuristica(calculaHeuristica(dir));
                         dir.setCustoG(pai.getCustoG() + 1);
                         dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
                         filhos.add(dir);
                     }
-                    if(!isBordaCima){
+                    if(row != 0){
                         Node cima = new Node();
                         cima.setPai(pai);
                         cima.setEstado(copiaEstado(pai.getEstado()));
                         cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
                         cima.getEstado()[row-1][col] = 0;
-                        cima.setHeuristica(calculaHeuristica3(cima));
+                        cima.setHeuristica(calculaHeuristica(cima));
                         cima.setCustoG(pai.getCustoG() + 1);
                         cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
                         filhos.add(cima);
                     }
-                    if(!isBordaBaixo){
+                    if(row != 3){
                         Node baixo = new Node();
                         baixo.setPai(pai);
                         baixo.setEstado(copiaEstado(pai.getEstado()));
                         baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
                         baixo.getEstado()[row+1][col] = 0;
-                        baixo.setHeuristica(calculaHeuristica3(baixo));
+                        baixo.setHeuristica(calculaHeuristica(baixo));
                         baixo.setCustoG(pai.getCustoG() + 1);
                         baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
                         filhos.add(baixo);                        
@@ -202,22 +227,6 @@ class Main {
         }
         return filhos;
     }
-    
-    static boolean isBordaDir(int col) {
-        return (col == 3);
-    }
-
-    static boolean isBordaEsq(int col) {
-        return (col == 0);
-    }
-
-    static boolean isBordaCima(int row) {
-        return (row == 0);
-    }
-
-    static boolean isBordaBaixo(int row) {
-        return (row == 3);
-    }  
     
     static int[][] copiaEstado(int[][] pai){
         int[][] novoEstado = new int[4][4];
