@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import static moa.a.estrela.Main.listaFinal;
@@ -28,8 +27,9 @@ class Main {
     //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  
     //static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos
     //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos 
-    static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
+    //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos 
     //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos
+    static int[][] listaInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos 
     static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
     static Node inicio = new Node();
     static Node menor;
@@ -43,9 +43,9 @@ class Main {
                 listaInicial[i][j] = num;
             }
         }*/
-        inicio.setPai(null);
         inicio.setEstado(listaInicial);
-        inicio.setHeuristica(calculaHeuristica1(inicio));
+        inicio.setHeuristica(calculaHeuristica3(inicio));
+        System.out.println(inicio.getHeuristica());
         inicio.setCustoG(0);
         inicio.setCustoF(inicio.getHeuristica() + inicio.getCustoG());
         inicio.setFilhos(filhosNode(inicio));
@@ -53,18 +53,17 @@ class Main {
     }
     
     static void aEstrela (){
-        estadosAbertos.add(inicio);        
+        estadosAbertos.add(inicio);    
         menor = estadosAbertos.iterator().next();
-        while ((!estadosAbertos.isEmpty()) && !isEstadoFinal(menor)) {            
+        while ((!estadosAbertos.isEmpty()) && !isEstadoFinal(menor)) {  
             estadosAbertos.remove(menor);
             estadosFechados.add(menor);                        
             if(menor.getFilhos() == null){
                 menor.setFilhos(filhosNode(menor));
             }
             for(Node filho: menor.getFilhos()){
-                
-                /*Iterator it = estadosAbertos.iterator();
-                while(it.hasNext()){
+                Iterator it = estadosAbertos.iterator();
+                /*while(it.hasNext()){
                     Node atual = (Node) it.next();
                     if(isIguais(atual, filho)){
                         if(filho.getCustoG()<atual.getCustoG()){
@@ -84,13 +83,14 @@ class Main {
                     }
                 }*/
                 estadosAbertos.add(filho);               
-                menor = estadosAbertos.iterator().next();                         
+                                         
             }
+            menor = estadosAbertos.iterator().next();
         }
         System.out.println(estadosAbertos.iterator().next().getCustoG());
     }
     
-    static int calculaHeuristica1(Node node) {
+    /*static int calculaHeuristica1(Node node) {
         int heuristica = 0;
         for (int i=0; i<4; i++) {
             for(int j=0; j<4; j++){
@@ -100,7 +100,7 @@ class Main {
             }
         }
         return heuristica;
-    }
+    }*/
     
     /*static int calculaHeuristica2(Node node){
         int heuristica = 0;
@@ -125,7 +125,22 @@ class Main {
     }*/
     
     static int calculaHeuristica3(Node node){
-        return 1;
+        int heuristica = 0;
+        for (int i=0; i<4; i++) {
+            for(int j=0; j<4; j++){
+                if(node.getEstado()[i][j] != listaFinal[i][j]){
+                    for (int k=0; k<4; k++) {
+                        for(int l=0; l<4; l++){
+                            if(node.getEstado()[k][l] == listaFinal[i][j]){
+                                heuristica += (Math.abs(k-i))+(Math.abs(l-j));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return heuristica;
     }
     
     static List<Node> filhosNode(Node pai) {
@@ -143,7 +158,7 @@ class Main {
                         esq.setEstado(copiaEstado(pai.getEstado()));
                         esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
                         esq.getEstado()[row][col-1] = 0;
-                        esq.setHeuristica(calculaHeuristica1(esq));
+                        esq.setHeuristica(calculaHeuristica3(esq));
                         esq.setCustoG(pai.getCustoG() + 1);
                         esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
                         filhos.add(esq);                         
@@ -154,7 +169,7 @@ class Main {
                         dir.setEstado(copiaEstado(pai.getEstado()));
                         dir.getEstado()[row][col] = pai.getEstado()[row][col+1];
                         dir.getEstado()[row][col+1] = 0;
-                        dir.setHeuristica(calculaHeuristica1(dir));
+                        dir.setHeuristica(calculaHeuristica3(dir));
                         dir.setCustoG(pai.getCustoG() + 1);
                         dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
                         filhos.add(dir);
@@ -165,7 +180,7 @@ class Main {
                         cima.setEstado(copiaEstado(pai.getEstado()));
                         cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
                         cima.getEstado()[row-1][col] = 0;
-                        cima.setHeuristica(calculaHeuristica1(cima));
+                        cima.setHeuristica(calculaHeuristica3(cima));
                         cima.setCustoG(pai.getCustoG() + 1);
                         cima.setCustoF(cima.getHeuristica() + cima.getCustoG());
                         filhos.add(cima);
@@ -176,7 +191,7 @@ class Main {
                         baixo.setEstado(copiaEstado(pai.getEstado()));
                         baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
                         baixo.getEstado()[row+1][col] = 0;
-                        baixo.setHeuristica(calculaHeuristica1(baixo));
+                        baixo.setHeuristica(calculaHeuristica3(baixo));
                         baixo.setCustoG(pai.getCustoG() + 1);
                         baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
                         filhos.add(baixo);                        
@@ -281,6 +296,7 @@ class Node implements Comparable<Node>{
     }
     //</editor-fold>
     
+    //Para não ter estado repetido, manter ordenado e priorizar o estado terminal
     @Override
     public int compareTo(Node o) {
         if (Arrays.deepEquals(estado, o.estado)){
