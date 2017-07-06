@@ -8,10 +8,13 @@ package moa.a.estrela;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import static moa.a.estrela.Main.listaFinal;
 
@@ -23,18 +26,25 @@ class Main {
     
     static Set<Node> estadosAbertos = new TreeSet<>();
     static Set<Node> estadosFechados = new TreeSet<>();
+    //static Map<int[][], Node> hashAbertos = new HashMap<>();
+    //static Map<int[][], Node> hashFechados = new HashMap<>();
+    //static Map<int[][], Boolean> hashTerminal = new HashMap<>();
     //static int[][] listaInicial = new int[4][4];
     //static int[][] listaInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos  Heuristicas OK = 1 3 4 5
-    static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos  Heuristicas OK = 1 2 3 4 5
+    //static int[][] listaInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos  Heuristicas OK = 1 2 3 4 5
     //static int[][] listaInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos  Heuristicas OK = 1 3 4 5
-    //static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos  Heuristicas OK = 1 3 4 5
+    static int[][] listaInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos  Heuristicas OK = 1 3 4 5
     //static int[][] listaInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos  Heuristicas OK = 
     //static int[][] listaInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos  Heuristicas OK = 
+    //static int[][] listaInicial = {{15,11,7,3}, {14,10,6,2}, {13,9,5,1}, {12,8,4,0}}; //MAX Movimentos  Heuristicas OK = 
     static int[][] listaFinal = {{1,5,9,13}, {2,6,10,14}, {3,7,11,15}, {4,8,12,0}};
+  
     static Node inicio = new Node();
     static Node menor;
+    static List<Node> filhos = new ArrayList<>();
     
     public static void main(String[] args) {
+        //hashTerminal.put(listaFinal, true);
         /*Scanner scan = new Scanner(System.in);
         int num = 0;
         for(int i=0;i<4;i++){
@@ -47,22 +57,85 @@ class Main {
         inicio.setHeuristica(calculaHeuristica(inicio));
         inicio.setCustoG(0);
         inicio.setCustoF(inicio.getHeuristica() + inicio.getCustoG());
-        inicio.setFilhos(filhosNode(inicio));
+        //inicio.setFilhos(filhosNode(inicio));
+        filhos = filhosNode(inicio);
         aEstrela();
     }
     
     static void aEstrela (){
+        int i = 0;
         estadosAbertos.add(inicio);    
+        //hashAbertos.put(inicio.getEstado(), inicio);
+        //System.out.println("A = " + estadosAbertos.size() + " Hash = " + hashAbertos.size() + " Iteracoes: " + i);
         menor = estadosAbertos.iterator().next();
-        while ((!estadosAbertos.isEmpty()) && !isEstadoFinal(menor)) {  
+        while ((!estadosAbertos.isEmpty()) && !isEstadoFinal(menor)) { 
+
+        //while ((!estadosAbertos.isEmpty()) && !(hashTerminal.containsKey(menor.getEstado()))) { 
             estadosAbertos.remove(menor);
-            estadosFechados.add(menor);                        
-            if(menor.getFilhos() == null){
+            //hashAbertos.remove(menor.getEstado());
+            estadosFechados.add(menor);  
+            //hashFechados.put(menor.getEstado(), menor);
+            /*if(menor.getFilhos() == null){
                 menor.setFilhos(filhosNode(menor));
+            }*/
+            if(filhos.isEmpty()){
+                filhosNode(menor);
             }
-            for(Node filho: menor.getFilhos()){
-                Iterator it = estadosAbertos.iterator();
-                /*while(it.hasNext()){
+            //for(Node filho: menor.getFilhos()){
+            for(Node filho: filhos){
+                i++;
+                if(estadosAbertos.contains(filho)){
+                    Iterator it = estadosAbertos.iterator();
+                    while(it.hasNext()){
+                        Node atual = (Node) it.next();
+                        if(isIguais(atual, filho)){
+                            /*System.out.println("Iteracao: "+i);
+                            System.out.println("G FILHO: "+ filho.getCustoG());
+                            System.out.println("G ABERTO: "+atual.getCustoG());
+                            int k;
+                            for(int m=0;m<4;m++){
+                                for(int n=0;n<4;n++){
+                                    System.out.print("  " + filho.getEstado()[m][n]);
+                                }
+                                System.out.print("\n");
+                            }
+                            System.out.print("\n");
+                            for(int m=0;m<4;m++){
+                                for(int n=0;n<4;n++){
+                                    System.out.print("  " + atual.getEstado()[m][n]);
+                                }
+                                System.out.print("\n");
+                            }
+                            Scanner scan = new Scanner(System.in);
+                            scan.nextInt();*/
+                            if(filho.getCustoG()<atual.getCustoG()){
+                                //System.out.print("REMOVE");
+                                estadosAbertos.remove(atual);    
+                                break;
+                            }
+                        }
+                    }
+                    //int k;
+                    //System.out.println("Iteracao: "+i);
+                    //Scanner scan = new Scanner(System.in);
+                    //scan.nextInt();
+                    
+               }
+                /*if(estadosFechados.contains(filho)){
+                    estadosFechados.remove(filho);
+                }*/
+                /*Node f2 = hashAbertos.get(filho);
+                if((f2!=null) && (filho.getCustoG() < f2.getCustoG())){
+                    estadosAbertos.remove(f2);
+                    hashAbertos.remove(f2);
+                }
+                Node f3 = hashFechados.get(filho);
+                if((f3!=null) && (filho.getCustoG() < f3.getCustoG())){
+                    estadosFechados.remove(f3);
+                    hashFechados.remove(f3);
+                }*/
+                /*Iterator it = estadosAbertos.iterator();
+                while(it.hasNext()){
                     Node atual = (Node) it.next();
                     if(isIguais(atual, filho)){
                         if(filho.getCustoG()<atual.getCustoG()){
@@ -81,11 +154,18 @@ class Main {
                         }
                     }
                 }*/
-                estadosAbertos.add(filho);               
+                if(!estadosAbertos.contains(filho)){
+                    if(!estadosFechados.contains(filho)){
+                        //estadosFechados.remove(filho);
+                    estadosAbertos.add(filho); }
+                }
+                //hashAbertos.put(filho.getEstado(), filho);
                                          
             }
+            filhos.clear();
             menor = estadosAbertos.iterator().next();
         }
+        System.out.println("A: " + estadosAbertos.size() + " Iteracoes: " + i);
         System.out.println(estadosAbertos.iterator().next().getCustoG());
     }
     
@@ -93,8 +173,8 @@ class Main {
         //return heuristica1(node);
         //return heuristica2(node);
         //return heuristica3(node);
-        //return heuristica4(node);
-        return heuristica5(node);
+        return heuristica4(node);
+        //return heuristica5(node);
     }
     
     static int heuristica1(Node node) {
@@ -173,35 +253,13 @@ class Main {
     }
     
     static List<Node> filhosNode(Node pai) {
-        List<Node> filhos = new ArrayList<Node>();
+        //List<Node> filhos = new ArrayList<Node>();
         for (int row=0; row<4; row++) {
             for(int col=0; col<4; col++){
                 if (pai.getEstado()[row][col] == 0){
-                    if(col != 0){
-                        Node esq = new Node();
-                        esq.setPai(pai);
-                        esq.setEstado(copiaEstado(pai.getEstado()));
-                        esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
-                        esq.getEstado()[row][col-1] = 0;
-                        esq.setHeuristica(calculaHeuristica(esq));
-                        esq.setCustoG(pai.getCustoG() + 1);
-                        esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
-                        filhos.add(esq);                         
-                    }
-                    if(col != 3){
-                        Node dir = new Node();
-                        dir.setPai(pai);
-                        dir.setEstado(copiaEstado(pai.getEstado()));
-                        dir.getEstado()[row][col] = pai.getEstado()[row][col+1];
-                        dir.getEstado()[row][col+1] = 0;
-                        dir.setHeuristica(calculaHeuristica(dir));
-                        dir.setCustoG(pai.getCustoG() + 1);
-                        dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
-                        filhos.add(dir);
-                    }
                     if(row != 0){
                         Node cima = new Node();
-                        cima.setPai(pai);
+                        //cima.setPai(pai);
                         cima.setEstado(copiaEstado(pai.getEstado()));
                         cima.getEstado()[row][col] = pai.getEstado()[row-1][col];
                         cima.getEstado()[row-1][col] = 0;
@@ -212,7 +270,7 @@ class Main {
                     }
                     if(row != 3){
                         Node baixo = new Node();
-                        baixo.setPai(pai);
+                        //baixo.setPai(pai);
                         baixo.setEstado(copiaEstado(pai.getEstado()));
                         baixo.getEstado()[row][col] = pai.getEstado()[row+1][col];
                         baixo.getEstado()[row+1][col] = 0;
@@ -220,7 +278,30 @@ class Main {
                         baixo.setCustoG(pai.getCustoG() + 1);
                         baixo.setCustoF(baixo.getHeuristica() + baixo.getCustoG());
                         filhos.add(baixo);                        
-                    }                                      
+                    }
+                    if(col != 0){
+                        Node esq = new Node();
+                        //esq.setPai(pai);
+                        esq.setEstado(copiaEstado(pai.getEstado()));
+                        esq.getEstado()[row][col] = pai.getEstado()[row][col-1];
+                        esq.getEstado()[row][col-1] = 0;
+                        esq.setHeuristica(calculaHeuristica(esq));
+                        esq.setCustoG(pai.getCustoG() + 1);
+                        esq.setCustoF(esq.getHeuristica() + esq.getCustoG());
+                        filhos.add(esq);                         
+                    }
+                    if(col != 3){
+                        Node dir = new Node();
+                        //dir.setPai(pai);
+                        dir.setEstado(copiaEstado(pai.getEstado()));
+                        dir.getEstado()[row][col] = pai.getEstado()[row][col+1];
+                        dir.getEstado()[row][col+1] = 0;
+                        dir.setHeuristica(calculaHeuristica(dir));
+                        dir.setCustoG(pai.getCustoG() + 1);
+                        dir.setCustoF(dir.getHeuristica() + dir.getCustoG());
+                        filhos.add(dir);
+                    }
+                                                          
                     return filhos;
                 }
             }
@@ -248,12 +329,12 @@ class Main {
 
 class Node implements Comparable<Node>{
  
-    private Node pai;
+    //private Node pai;
     private int[][] estado;
     private int heuristica;
     private int custoG;
     private int custoF;
-    private List<Node> filhos;
+    //private List<Node> filhos;
 
     //<editor-fold defaultstate="collapsed" desc=" Getters e Setters ">
     public int getHeuristica() {
@@ -288,7 +369,7 @@ class Node implements Comparable<Node>{
         this.estado = estado;
     }
 
-    public Node getPai() {
+    /*public Node getPai() {
         return pai;
     }
 
@@ -302,13 +383,14 @@ class Node implements Comparable<Node>{
 
     public void setFilhos(List<Node> filhos) {
         this.filhos = filhos;
-    }
+    }*/
     //</editor-fold>
     
     //Para não ter estado repetido, manter ordenado e priorizar o estado terminal
     @Override
     public int compareTo(Node o) {
         if (Arrays.deepEquals(estado, o.estado)){
+            
             return 0;
         }
         else if (this.custoF <= o.getCustoF()) {
