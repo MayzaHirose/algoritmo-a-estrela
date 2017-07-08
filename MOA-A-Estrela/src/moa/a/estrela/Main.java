@@ -6,7 +6,6 @@
 
 package moa.a.estrela;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +13,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -34,13 +31,25 @@ class Main {
     //static int[][] nodeInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos  
     //static int[][] nodeInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos 
     static int[][] nodeInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos
+    
+    //static int[][] nodeInicial = {{5,13,6,10}, {1,7,2,9}, {4,3,15,14}, {8,0,11,12}}; // 1º 20 Movimentos
+    //static int[][] nodeInicial = {{2,10,11,9}, {3,1,0,13}, {4,6,7,14}, {5,8,12,15}}; // 2º 27 Movimentos
+    //static int[][] nodeInicial = {{5,9,13,10}, {2,6,14,15}, {1,4,7,12}, {0,3,11,8}}; // 3º 27 Movimentos
+    //static int[][] nodeInicial = {{7,11,4,5}, {0,6,15,8}, {14,1,3,13}, {9,12,10,2}}; // 4º 57 Movimentos
+    //static int[][] nodeInicial = {{5,10,9,14}, {7,3,13,6}, {1,15,0,12}, {8,2,4,11}}; // 5º 34 Movimentos
+    //static int[][] nodeInicial = {{0,9,3,7}, {1,14,6,4}, {2,11,12,15}, {13,8,10,5}}; // 6º
+    //static int[][] nodeInicial = {{3,9,0,7}, {2,1,6,5}, {11,13,4,12}, {8,14,15,10}}; // 7º 44 Movimentos
+    //static int[][] nodeInicial = {{9,6,7,4}, {2,1,5,12}, {8,3,11,0}, {14,15,10,13}}; // 8º 51 Movimentos
+    //static int[][] nodeInicial = {{2,9,4,5}, {0,7,11,12}, {14,6,3,13}, {1,8,15,10}}; // 9º 49 Movimentos
+    //static int[][] nodeInicial = {{7,11,5,12}, {9,8,6,13}, {2,3,4,10}, {14,1,15,0}}; // 10º
+    
     static int[][] nodeTerminal = {{1, 5, 9, 13}, {2, 6, 10, 14}, {3, 7, 11, 15}, {4, 8, 12, 0}};
     
     static Node menor;
     static Node first;
     static List<Node> filhos;
     
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args){
         /*Scanner scan = new Scanner(System.in);;
         int num = 0;
         for (int i = 0; i < 4; i++) {
@@ -62,7 +71,9 @@ class Main {
         aEstrela();
     }
     
-    static void aEstrela() throws IOException{
+    static void aEstrela(){
+        boolean isNosAbertos;
+        boolean isNosFechados;
         treeAbertos.add(first);
         hashAbertos.put(first.getHash(), first);      
         menor = treeAbertos.iterator().next();
@@ -77,22 +88,34 @@ class Main {
             System.out.println("MENOR\t H: " + menor.getHeuristica() + "\t G: " + menor.getCustoG() + "\t F: " + menor.getCustoF() + "\t Hash: " + menor.getHash());
             System.in.read();  */         
             for(Node filho: filhos){
+                isNosAbertos = hashAbertos.containsKey(filho.getHash());
+                isNosFechados = hashFechados.containsKey(filho.getHash());
                 /*System.out.println("\nFilho");
                 printaMatriz(filho.getEstado());*/
-                if(hashAbertos.containsKey(filho.getHash())){
+                if(isNosAbertos){
                     Node igual = hashAbertos.get(filho.getHash());
                     if(filho.getCustoG() < igual.getCustoG()){
                         treeAbertos.remove(igual);
                         hashAbertos.remove(igual.getHash());
+                        isNosAbertos = false;
                     }
-                } 
-                if(hashFechados.containsKey(filho.getHash())){
+                } /*else if(hashFechados.containsKey(filho.getHash())){
                     Node igual = hashFechados.get(filho.getHash());
                     if(filho.getCustoG() < igual.getCustoG()){
                         hashFechados.remove(igual.getHash());
                     }
+                } else {
+                    treeAbertos.add(filho);
+                    hashAbertos.put(filho.getHash(), filho);
+                }*/
+                if(isNosFechados){
+                    Node igual = hashFechados.get(filho.getHash());
+                    if(filho.getCustoG() < igual.getCustoG()){
+                        hashFechados.remove(igual.getHash());
+                        isNosFechados = false;
+                    }
                 }
-                if(!hashAbertos.containsKey(filho.getHash()) && !hashFechados.containsKey(filho.getHash())){ 
+                if(!isNosAbertos && !isNosFechados){ 
                     treeAbertos.add(filho);
                     hashAbertos.put(filho.getHash(), filho);
                 }
@@ -182,7 +205,7 @@ class Main {
     }
 
     static int heuristica4(Node node) {
-        float heuristica = 0;
+        float heuristica = 0F;
         float p1 = 1 / 3F;
         float p2 = 1 / 3F;
         float p3 = 1 / 3F;
