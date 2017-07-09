@@ -16,50 +16,51 @@ import java.util.TreeSet;
 
 /**
  *
- * @author MayzaHirose
+ * @author Mayza Yuri Hirose da Costa RA88739
  */
 class Main {
+    static final int HEURISTICA = 3; //Selecione aqui a Heurística a ser utilizada
     static Set<Node> treeAbertos = new TreeSet<>();
     static Map<String, Node> hashAbertos = new HashMap<>();
     static Map<String, Node> hashFechados = new HashMap<>();
     static Map<String, Boolean> hashTerminal = new HashMap<>();
     static Map<Integer,Coordenada> hashPosCorretaH3 = new HashMap<>();
-    //static int[][] nodeInicial = new int[4][4];
+    static int[][] nodeInicial = new int[4][4];
     //static int[][] nodeInicial = {{2,1,5,9}, {3,6,10,13}, {4,7,11,14}, {0,8,12,15}}; //9 Movimentos 
     //static int[][] nodeInicial = {{6,5,13,0}, {1,7,9,14}, {2,8,10,15}, {3,4,11,12}}; //15 Movimentos  
     //static int[][] nodeInicial = {{2,1,10,9}, {3,5,11,13}, {4,0,6,12}, {7,8,15,14}}; //21 Movimentos  
     //static int[][] nodeInicial = {{2,1,5,0}, {7,9,10,13}, {6,4,3,15}, {8,11,12,14}}; //25 Movimentos  
     //static int[][] nodeInicial = {{1,5,7,0}, {4,6,12,10}, {8,2,15,9}, {3,14,11,13}}; //39 Movimentos 
-    static int[][] nodeInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos
+    //static int[][] nodeInicial = {{9,13,12,8}, {0,5,7,14}, {1,11,15,4}, {6,10,2,3}}; //47 Movimentos
     
     //static int[][] nodeInicial = {{5,13,6,10}, {1,7,2,9}, {4,3,15,14}, {8,0,11,12}}; // 1º 20 Movimentos
     //static int[][] nodeInicial = {{2,10,11,9}, {3,1,0,13}, {4,6,7,14}, {5,8,12,15}}; // 2º 27 Movimentos
     //static int[][] nodeInicial = {{5,9,13,10}, {2,6,14,15}, {1,4,7,12}, {0,3,11,8}}; // 3º 27 Movimentos
     //static int[][] nodeInicial = {{7,11,4,5}, {0,6,15,8}, {14,1,3,13}, {9,12,10,2}}; // 4º 57 Movimentos
     //static int[][] nodeInicial = {{5,10,9,14}, {7,3,13,6}, {1,15,0,12}, {8,2,4,11}}; // 5º 34 Movimentos
-    //static int[][] nodeInicial = {{0,9,3,7}, {1,14,6,4}, {2,11,12,15}, {13,8,10,5}}; // 6º
+    //static int[][] nodeInicial = {{0,9,3,7}, {1,14,6,4}, {2,11,12,15}, {13,8,10,5}}; // 6º 56 Movimentos
     //static int[][] nodeInicial = {{3,9,0,7}, {2,1,6,5}, {11,13,4,12}, {8,14,15,10}}; // 7º 44 Movimentos
     //static int[][] nodeInicial = {{9,6,7,4}, {2,1,5,12}, {8,3,11,0}, {14,15,10,13}}; // 8º 51 Movimentos
     //static int[][] nodeInicial = {{2,9,4,5}, {0,7,11,12}, {14,6,3,13}, {1,8,15,10}}; // 9º 49 Movimentos
-    //static int[][] nodeInicial = {{7,11,5,12}, {9,8,6,13}, {2,3,4,10}, {14,1,15,0}}; // 10º
+    //static int[][] nodeInicial = {{7,11,5,12}, {9,8,6,13}, {2,3,4,10}, {14,1,15,0}}; // 10º 50 Movimentos
     
-    static int[][] nodeTerminal = {{1, 5, 9, 13}, {2, 6, 10, 14}, {3, 7, 11, 15}, {4, 8, 12, 0}};
+    static int[][] nodeObjetivo = {{1, 5, 9, 13}, {2, 6, 10, 14}, {3, 7, 11, 15}, {4, 8, 12, 0}};
     
     static Node menor;
     static Node first;
     static List<Node> filhos;
-    
+    static Long start = System.currentTimeMillis();
     public static void main(String[] args){
-        /*Scanner scan = new Scanner(System.in);;
+        Scanner scan = new Scanner(System.in);;
         int num = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 num = scan.nextInt();
                 nodeInicial[i][j] = num;
             }
-        }*/
-        inicializaHashH3();
-        hashTerminal.put(chaveHashEstado(nodeTerminal), Boolean.TRUE);
+        }
+        if(HEURISTICA != 1 && HEURISTICA != 2){inicializaHashH3();}
+        hashTerminal.put(chaveHashEstado(nodeObjetivo), Boolean.TRUE);
         filhos = new ArrayList<>();
         first = new Node();
         first.setEstado(nodeInicial);
@@ -82,16 +83,10 @@ class Main {
             treeAbertos.remove(menor);
             hashAbertos.remove(menor.getHash());
             hashFechados.put(menor.getHash(), menor);
-            criaFilhosNode(menor);
-            /*System.out.println("TreeA: " + treeAbertos.size() + "\tHashA: " + hashAbertos.size() + "\tHashF: " + hashFechados.size());
-            printaMatriz(menor.getEstado());
-            System.out.println("MENOR\t H: " + menor.getHeuristica() + "\t G: " + menor.getCustoG() + "\t F: " + menor.getCustoF() + "\t Hash: " + menor.getHash());
-            System.in.read();  */         
+            criaFilhosNode(menor);        
             for(Node filho: filhos){
                 isNosAbertos = hashAbertos.containsKey(filho.getHash());
                 isNosFechados = hashFechados.containsKey(filho.getHash());
-                /*System.out.println("\nFilho");
-                printaMatriz(filho.getEstado());*/
                 if(isNosAbertos){
                     Node igual = hashAbertos.get(filho.getHash());
                     if(filho.getCustoG() < igual.getCustoG()){
@@ -99,15 +94,7 @@ class Main {
                         hashAbertos.remove(igual.getHash());
                         isNosAbertos = false;
                     }
-                } /*else if(hashFechados.containsKey(filho.getHash())){
-                    Node igual = hashFechados.get(filho.getHash());
-                    if(filho.getCustoG() < igual.getCustoG()){
-                        hashFechados.remove(igual.getHash());
-                    }
-                } else {
-                    treeAbertos.add(filho);
-                    hashAbertos.put(filho.getHash(), filho);
-                }*/
+                }
                 if(isNosFechados){
                     Node igual = hashFechados.get(filho.getHash());
                     if(filho.getCustoG() < igual.getCustoG()){
@@ -146,18 +133,27 @@ class Main {
     }
     
     static int calculaHeuristica(Node node) {
-        //return heuristica1(node);
-        //return heuristica2(node);
-        return heuristica3(node);
-        //return heuristica4(node);
-        //return heuristica5(node);
+        switch(HEURISTICA){
+            case 1:
+                return heuristica1(node);
+            case 2:
+                return heuristica2(node);
+            case 3:
+                return heuristica3(node);
+            case 4:
+                return heuristica4(node);
+            case 5:
+                return heuristica5(node);
+            default:
+                return heuristica3(node);
+        }
     }
     
     static int heuristica1(Node node) {
         int heuristica = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if ((node.getEstado()[i][j] != nodeTerminal[i][j]) && (node.getEstado()[i][j] != 0)) {
+                if ((node.getEstado()[i][j] != nodeObjetivo[i][j]) && (node.getEstado()[i][j] != 0)) {
                     heuristica++;
                 }
             }
@@ -195,7 +191,7 @@ class Main {
         Coordenada coord;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (node.getEstado()[i][j] != nodeTerminal[i][j] && node.getEstado()[i][j] != 0) {
+                if (node.getEstado()[i][j] != nodeObjetivo[i][j] && node.getEstado()[i][j] != 0) {
                     coord = hashPosCorretaH3.get(node.getEstado()[i][j]);
                     heuristica += Math.abs(coord.x - i) + Math.abs(coord.y - j);
                 }
@@ -206,26 +202,15 @@ class Main {
 
     static int heuristica4(Node node) {
         float heuristica = 0F;
-        float p1 = 1 / 3F;
-        float p2 = 1 / 3F;
-        float p3 = 1 / 3F;
+        float p1 = 0.2F;
+        float p2 = 0.1F;
+        float p3 = 0.7F;
         heuristica = (p1 * heuristica1(node)) + (p2 * heuristica2(node)) + (p3 * heuristica3(node));
-
         return (int) heuristica;
     }
 
     static int heuristica5(Node node) {
-        int heuristica, h2, h3;
-        heuristica = heuristica1(node);
-        h2 = heuristica2(node);
-        h3 = heuristica3(node);
-        if (h2 > heuristica) {
-            heuristica = h2;
-        }
-        if (h3 > heuristica) {
-            heuristica = h3;
-        }
-        return heuristica;
+        return Math.max(Math.max(heuristica1(node), heuristica2(node)), heuristica3(node));
     }
     
     static void inicializaHashH3(){
@@ -298,16 +283,6 @@ class Main {
                 }
             }
         }
-    }
-    
-    public static void printaMatriz(int[][] matriz) {
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
-                System.out.print("\t " + matriz[i][j]);
-            }
-            System.out.println("");
-        }
-        System.out.println("");
     }
 }
 
@@ -389,8 +364,7 @@ class Coordenada{
     public int x;
     public int y;
     
-    public Coordenada(){
-        
+    public Coordenada(){       
     }
 
     public Coordenada(int x, int y){
